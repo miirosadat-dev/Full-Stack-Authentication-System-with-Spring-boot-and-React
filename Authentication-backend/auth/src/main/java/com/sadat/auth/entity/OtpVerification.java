@@ -52,4 +52,8 @@ public class OtpVerification {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private int attemptCount = 0;
 }

@@ -28,7 +28,7 @@ function Hero() {
                     <span className="w-2.5 h-2.5 rounded-full bg-white/15"></span>
                 </div>
                 <p className="text-brass">// decoded session token</p>
-                <pre className="mt-3 text-paper/90">
+                <pre className="mt-3 lg:ml-30 md:ml-15 ml-5 text-paper/90">
                     {`{
   "sub": "user_8f2a1c",
   "email_verified": true,

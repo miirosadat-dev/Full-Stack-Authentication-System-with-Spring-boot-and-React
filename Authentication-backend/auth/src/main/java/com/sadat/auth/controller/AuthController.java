@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sadat.auth.dto.AuthResponse;
 import com.sadat.auth.dto.RegisterRequest;
+import com.sadat.auth.dto.ResendVerificationRequest;
 import com.sadat.auth.service.AuthService;
 
 @RestController
@@ -26,5 +27,11 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<String> resendVerification(@Valid @RequestBody ResendVerificationRequest request) {
+        authService.resendVerification(request.email());
+        return ResponseEntity.ok("If an account with that email exists, a verification code has been sent.");
     }
 }

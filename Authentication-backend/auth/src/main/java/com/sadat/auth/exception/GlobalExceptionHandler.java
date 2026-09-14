@@ -40,4 +40,11 @@ public class GlobalExceptionHandler {
                 Instant.now(), 400, "Bad Request", message, request.getRequestURI());
         return ResponseEntity.badRequest().body(error);
     }
+
+    @ExceptionHandler(OtpCooldownException.class)
+    public ResponseEntity<ApiError> handleOtpCooldown(OtpCooldownException ex, HttpServletRequest request) {
+        ApiError error = new ApiError(
+                Instant.now(), 429, "Too Many Requests", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error);
+    }
 }

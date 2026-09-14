@@ -42,4 +42,14 @@ public class AuthService {
         return new AuthResponse(saved.getId(), saved.getEmail(), saved.isEmailVerified(),
                 "Registration successful. Please verify your email.");
     }
+
+    public void resendVerification(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            if (!user.isEmailVerified()) {
+                otpService.createAndSendOtp(user, OtpVerification.Purpose.EMAIL_VERIFICATION);
+            }
+        });
+        // Deliberately no branch for "user not found" or "already verified" —
+        // the caller gets an identical response either way. See controller.
+    }
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.sadat.auth.dto.AuthResponse;
 import com.sadat.auth.dto.RegisterRequest;
+import com.sadat.auth.entity.OtpVerification;
 import com.sadat.auth.entity.User;
 import com.sadat.auth.exception.DuplicateEmailException;
 import com.sadat.auth.repository.UserRepository;
@@ -12,12 +13,14 @@ import com.sadat.auth.repository.UserRepository;
 @Service
 public class AuthService {
 
+    private final OtpService otpService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.otpService = otpService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -33,6 +36,8 @@ public class AuthService {
                 .build();
 
         User saved = userRepository.save(user);
+
+        otpService.createAndSendOtp(saved, OtpVerification.Purpose.EMAIL_VERIFICATION);
 
         return new AuthResponse(saved.getId(), saved.getEmail(), saved.isEmailVerified(),
                 "Registration successful. Please verify your email.");

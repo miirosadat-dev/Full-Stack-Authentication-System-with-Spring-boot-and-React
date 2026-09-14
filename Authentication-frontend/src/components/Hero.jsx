@@ -1,20 +1,21 @@
 function Hero() {
     return (
-        <section className="max-w-6xl mx-auto px-6 pt-20 pb-28 grid md:grid-cols-2 gap-16 items-center">
+        <section className="max-w-6xl mx-auto px-6 pt-20 pb-28 grid md:grid-cols-2 gap-10 items-center">
             <div>
-                <h1 className="font-display text-5xl md:text-6xl leading-[1.05] tracking-tight">
-                    Authentication your users never have to think about.
+                <h1 className="font-display text-2xl md:text-3xl leading-[1.05] text-ink-light tracking-tight">
+                    Top Security Authentication Built with React & Spring Boot.
                 </h1>
-                <p className="mt-6 text-slate-muted text-lg leading-relaxed max-w-md">
+                <p className="mt-6 text-black/80 text-lg leading-relaxed max-w-md">
                     Anchor handles registration, email verification, and session security
                     end to end — so every sign-in is provably yours, without your team
                     reinventing the parts that are easy to get wrong.
                 </p>
-                <div className="mt-9 flex items-center gap-4">
-                    <button className="px-6 py-3 bg-brass text-ink font-medium rounded-md hover:bg-brass-light transition-colors">
+                <div className="mt-9 flex w-full items-center justify-between sm:w-auto sm:justify-start sm:gap-4">
+                    <button className="px-6 py-3 bg-ink-light cursor-pointer text-ink font-medium rounded-md hover:bg-brass transition-colors">
                         Get started
                     </button>
-                    <button className="px-6 py-3 text-paper/90 border border-white/15 rounded-md hover:border-white/30 transition-colors">
+
+                    <button className="px-6 py-3 text-orange-500 cursor-pointer border border-white/15 rounded-md hover:border-white/30 transition-colors">
                         Log in
                     </button>
                 </div>
@@ -26,7 +27,7 @@ function Hero() {
                     <span className="w-2.5 h-2.5 rounded-full bg-white/15"></span>
                     <span className="w-2.5 h-2.5 rounded-full bg-white/15"></span>
                 </div>
-                <p className="text-slate-muted">// decoded session token</p>
+                <p className="text-brass">// decoded session token</p>
                 <pre className="mt-3 text-paper/90">
                     {`{
   "sub": "user_8f2a1c",

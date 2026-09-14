@@ -1,7 +1,7 @@
 import PublicLayout from '../layouts/PublicLayout';
 import Hero from '../components/Hero';
 
-function Landing() {
+function LandingPage() {
     return (
         <PublicLayout>
             <Hero />
@@ -9,4 +9,4 @@ function Landing() {
     );
 }
 
-export default Landing;
+export default LandingPage;

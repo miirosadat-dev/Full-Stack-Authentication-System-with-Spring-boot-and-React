@@ -2,12 +2,12 @@
 
 
 @theme {
-    --color-ink: #0b1220;
+    --color-ink: #f7fbfd;
     --color-ink-light: #131B2E;
     --color-paper: #F4F2EC;
     --color-brass: #C9A227;
     --color-brass-light: #E4C55E;
-    --color-slate-muted: #94A3B8;
+    --color-slate-muted: #000;
 
     --font-display: "Fraunces", serif;
     --font-body: "Inter", sans-serif;

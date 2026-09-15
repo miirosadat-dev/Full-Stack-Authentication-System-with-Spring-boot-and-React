@@ -8,6 +8,8 @@ import com.sadat.auth.dto.RegisterRequest;
 import com.sadat.auth.entity.OtpVerification;
 import com.sadat.auth.entity.User;
 import com.sadat.auth.exception.DuplicateEmailException;
+import com.sadat.auth.exception.EmailAlreadyVerifiedException;
+import com.sadat.auth.exception.InvalidOtpException;
 import com.sadat.auth.repository.UserRepository;
 
 @Service
@@ -51,5 +53,21 @@ public class AuthService {
         });
         // Deliberately no branch for "user not found" or "already verified" —
         // the caller gets an identical response either way. See controller.
+    }
+
+    public AuthResponse verifyEmail(VerifyEmailRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new InvalidOtpException("Invalid code or account"));
+
+        if (user.isEmailVerified()) {
+            throw new EmailAlreadyVerifiedException("This email is already verified. Please log in.");
+        }
+
+        otpService.verifyOtp(user, OtpVerification.Purpose.EMAIL_VERIFICATION, request.code());
+
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        return new AuthResponse(user.getId(), user.getEmail(), true, "Email verified successfully.");
     }
 }

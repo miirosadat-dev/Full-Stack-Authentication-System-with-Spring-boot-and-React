@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 
 import com.sadat.auth.entity.OtpVerification;
 import com.sadat.auth.entity.User;
+import com.sadat.auth.exception.InvalidOtpException;
 import com.sadat.auth.exception.OtpCooldownException;
+import com.sadat.auth.exception.OtpExpiredException;
+import com.sadat.auth.exception.TooManyOtpAttemptsException;
 import com.sadat.auth.repository.OtpVerificationRepository;
 
 import java.security.SecureRandom;
@@ -19,6 +22,8 @@ public class OtpService {
 
     private static final Duration RESEND_COOLDOWN = Duration.ofSeconds(60);
     private static final SecureRandom secureRandom = new SecureRandom();
+
+    private static final int MAX_ATTEMPTS = 5;
 
     private final OtpVerificationRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
@@ -65,5 +70,31 @@ public class OtpService {
     private String generateNumericCode() {
         int code = 100000 + secureRandom.nextInt(900000); // always 6 digits, 100000–999999
         return String.valueOf(code);
+    }
+
+    public void verifyOtp(User user, OtpVerification.Purpose purpose, String submittedCode) {
+        OtpVerification otp = otpRepository.findTopByUserAndPurposeOrderByCreatedAtDesc(user, purpose)
+                .filter(o -> !o.isConsumed())
+                .orElseThrow(
+                        () -> new InvalidOtpException("No active verification code found. Please request a new one."));
+
+        if (otp.getAttemptCount() >= MAX_ATTEMPTS) {
+            throw new TooManyOtpAttemptsException("Too many incorrect attempts. Please request a new code.");
+        }
+
+        if (Instant.now().isAfter(otp.getExpiresAt())) {
+            otp.setConsumed(true);
+            otpRepository.save(otp);
+            throw new OtpExpiredException("This code has expired. Please request a new one.");
+        }
+
+        if (!passwordEncoder.matches(submittedCode, otp.getOtpCodeHash())) {
+            otp.setAttemptCount(otp.getAttemptCount() + 1);
+            otpRepository.save(otp);
+            throw new InvalidOtpException("Incorrect code. Please try again.");
+        }
+
+        otp.setConsumed(true);
+        otpRepository.save(otp);
     }
 }

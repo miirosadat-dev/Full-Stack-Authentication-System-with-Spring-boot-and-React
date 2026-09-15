@@ -1,4 +1,4 @@
-function Hero() {
+function Hero({ onOpenRegister }) {
     return (
         <section className="max-w-6xl mx-auto px-6 pt-20 pb-28 grid md:grid-cols-2 gap-10 items-center">
             <div>
@@ -11,7 +11,7 @@ function Hero() {
                     reinventing the parts that are easy to get wrong.
                 </p>
                 <div className="mt-9 flex w-full items-center justify-between sm:w-auto sm:justify-start sm:gap-4">
-                    <button className="px-6 py-3 bg-ink-light cursor-pointer text-ink font-medium rounded-md hover:bg-brass transition-colors">
+                    <button onClick={onOpenRegister} className="px-6 py-3 bg-ink-light cursor-pointer text-ink font-medium rounded-md hover:bg-brass transition-colors">
                         Get started
                     </button>
 

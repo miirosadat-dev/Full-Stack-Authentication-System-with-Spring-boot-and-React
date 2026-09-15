@@ -1,10 +1,10 @@
 import PublicLayout from '../layouts/PublicLayout';
 import Hero from '../components/Hero';
 
-function LandingPage() {
+function LandingPage({ onOpenRegister }) {
     return (
-        <PublicLayout>
-            <Hero />
+        <PublicLayout onOpenRegister={onOpenRegister}>
+            <Hero onOpenRegister={onOpenRegister} />
         </PublicLayout>
     );
 }

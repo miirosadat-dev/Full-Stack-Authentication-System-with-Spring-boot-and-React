@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.sadat.auth.dto.AuthResponse;
 import com.sadat.auth.dto.RegisterRequest;
+import com.sadat.auth.dto.VerifyEmailRequest;
 import com.sadat.auth.entity.OtpVerification;
 import com.sadat.auth.entity.User;
 import com.sadat.auth.exception.DuplicateEmailException;

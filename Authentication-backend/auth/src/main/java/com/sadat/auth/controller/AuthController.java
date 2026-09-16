@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sadat.auth.dto.AuthResponse;
+import com.sadat.auth.dto.LoginRequest;
+import com.sadat.auth.dto.LoginResponse;
 import com.sadat.auth.dto.RegisterRequest;
 import com.sadat.auth.dto.ResendVerificationRequest;
 import com.sadat.auth.dto.VerifyEmailRequest;
@@ -39,6 +41,12 @@ public class AuthController {
     @PostMapping("/verify-email")
     public ResponseEntity<AuthResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
         AuthResponse response = authService.verifyEmail(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 }

@@ -1,10 +1,10 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-function PublicLayout({ children, onOpenRegister }) {
+function PublicLayout({ children, onOpenRegister, onOpenLogin }) {
     return (
         <div className="min-h-screen bg-ink text-paper flex flex-col">
-            <Header onOpenRegister={onOpenRegister} />
+            <Header onOpenRegister={onOpenRegister} onOpenLogin={onOpenLogin} />
             <main className="flex-1">{children}</main>
             <Footer />
         </div>

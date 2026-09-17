@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { register } from '../services/authApi';
 
-function RegisterModal({ onClose, onRegistered }) {
+function RegisterModal({ onClose, onRegistered, onSwitchToLogin }) {
     const [form, setForm] = useState({ fullName: '', email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -66,8 +66,18 @@ function RegisterModal({ onClose, onRegistered }) {
                     >
                         {loading ? 'Creating account...' : 'Create account'}
                     </button>
+
+
+                    <p className="mt-4 text-center text-sm text-slate-600">
+                        Already have an account?{' '}
+                        <button type="button" onClick={onSwitchToLogin} className="text-orange-600 font-medium cursor-pointer hover:underline">
+                            Log in
+                        </button>
+                    </p>
                 </form>
             </div>
+
+
         </div>
     );
 }

@@ -34,3 +34,20 @@ export async function resendVerification(email) {
     });
     return handleResponse(res);
 }
+
+export async function getCurrentUser(token) {
+    const response = await fetch(`${BASE_URL}/auth/me`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch user');
+    }
+
+    return response.json();
+}

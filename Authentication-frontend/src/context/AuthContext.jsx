@@ -49,6 +49,7 @@ export function AuthProvider({ children }) {
         isLoading,
         login,
         logout,
+        refreshUser: () => { if (token) fetchCurrentUser(token); },
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

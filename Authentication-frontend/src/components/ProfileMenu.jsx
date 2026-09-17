@@ -37,7 +37,7 @@ function ProfileMenu({ onOpenVerify }) {
 
                     {!user.emailVerified && (
                         <button
-                            onClick={() => { setOpen(false); onOpenVerify(); }}
+                            onClick={() => { setOpen(false); onOpenVerify(user.email); }}
                             className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-slate-50"
                         >
                             Verify email

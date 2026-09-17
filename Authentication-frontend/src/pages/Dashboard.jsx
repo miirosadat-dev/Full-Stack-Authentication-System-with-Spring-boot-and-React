@@ -1,22 +1,17 @@
 import { useAuth } from '../context/AuthContext';
+import AppLayout from '../layouts/AppLayout';
 
-function Dashboard() {
-    const { user, logout } = useAuth();
+function Dashboard({ onOpenVerify }) {
+    const { user } = useAuth();
 
     return (
-        <div className="min-h-screen bg-ink text-paper p-8">
-            <div className="max-w-2xl mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-2xl font-bold">Hello, {user.fullName}</h1>
-                    {/* temporary — Phase 13 replaces this with the Avatar/ProfileMenu logout flow */}
-                    <button onClick={logout} className="text-sm text-orange-500 hover:underline">
-                        Log out
-                    </button>
-                </div>
+        <AppLayout onOpenVerify={onOpenVerify}>
+            <div className="max-w-2xl mx-auto p-8">
+                <h1 className="text-2xl font-bold mb-4">Hello, {user.fullName}</h1>
                 <p className="text-slate-muted">Email: {user.email}</p>
                 <p className="text-slate-muted">Verified: {user.emailVerified ? 'Yes' : 'No'}</p>
             </div>
-        </div>
+        </AppLayout>
     );
 }
 

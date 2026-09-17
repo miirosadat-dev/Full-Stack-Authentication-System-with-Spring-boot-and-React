@@ -29,9 +29,14 @@ function App() {
         notify('Account created — check your email for a code.', 'success');
     }
 
+    function handleOpenVerify(userEmail) {
+        setPendingEmail(userEmail);
+        setActiveModal('verify');
+    }
+
     function handleVerified() {
         setActiveModal(null);
-        notify('Email verified! You can now log in.', 'success');
+        notify('Email verified!', 'success');
     }
 
     return (
@@ -44,6 +49,7 @@ function App() {
                             <LandingPage
                                 onOpenRegister={() => setActiveModal('register')}
                                 onOpenLogin={() => setActiveModal('login')}
+                                onOpenVerify={handleOpenVerify}
                             />
                         }
                     />
@@ -51,7 +57,7 @@ function App() {
                         path="/dashboard"
                         element={
                             <ProtectedRoute>
-                                <Dashboard />
+                                <Dashboard onOpenVerify={handleOpenVerify} />
                             </ProtectedRoute>
                         }
                     />

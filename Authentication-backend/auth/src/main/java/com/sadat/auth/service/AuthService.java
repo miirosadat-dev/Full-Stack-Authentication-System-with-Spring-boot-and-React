@@ -10,6 +10,7 @@ import com.sadat.auth.dto.AuthResponse;
 import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
 import com.sadat.auth.dto.RegisterRequest;
+import com.sadat.auth.dto.UserResponse;
 import com.sadat.auth.dto.VerifyEmailRequest;
 import com.sadat.auth.entity.OtpVerification;
 import com.sadat.auth.entity.User;
@@ -102,5 +103,11 @@ public class AuthService {
         userRepository.save(user);
 
         return new AuthResponse(user.getId(), user.getEmail(), true, "Email verified successfully.");
+    }
+
+    public UserResponse getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException("User not found"));
+        return new UserResponse(user.getId(), user.getEmail(), user.getFullName(), user.isEmailVerified());
     }
 }

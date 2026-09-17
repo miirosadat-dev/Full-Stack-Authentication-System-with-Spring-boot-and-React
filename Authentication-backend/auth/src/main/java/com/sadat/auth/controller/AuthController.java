@@ -3,6 +3,8 @@ package com.sadat.auth.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
 import com.sadat.auth.dto.RegisterRequest;
 import com.sadat.auth.dto.ResendVerificationRequest;
+import com.sadat.auth.dto.UserResponse;
 import com.sadat.auth.dto.VerifyEmailRequest;
 import com.sadat.auth.service.AuthService;
 
@@ -47,6 +50,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+        UserResponse response = authService.getCurrentUser(authentication.getName());
         return ResponseEntity.ok(response);
     }
 }

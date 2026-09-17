@@ -36,33 +36,22 @@ export async function resendVerification(email) {
 }
 
 export async function getCurrentUser(token) {
-    const response = await fetch(`${BASE_URL}/auth/me`, {
+    const res = await fetch(`${API_BASE}/auth/me`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch user');
-    }
-
-    return response.json();
+    return handleResponse(res);
 }
 
 export async function loginUser({ email, password }) {
-    const response = await fetch(`${BASE_URL}/auth/login`, {
+    const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
     });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-    }
-
-    return response.json();
+    const data = await handleResponse(res);
+    return {
+        token: data.token,
+        user: { id: data.userId, email: data.email, fullName: data.fullName, emailVerified: data.emailVerified },
+    };
 }

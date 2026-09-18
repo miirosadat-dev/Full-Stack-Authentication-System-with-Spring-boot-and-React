@@ -1,5 +1,8 @@
 package com.sadat.auth.service;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -29,6 +32,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final Duration LOCKOUT_DURATION = Duration.ofMinutes(15);
 
     public AuthService(
             UserRepository userRepository,
@@ -44,19 +49,38 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(Instant.now())) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         } catch (AuthenticationException ex) {
+            registerFailedAttempt(user);
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+        if (user.getFailedLoginAttempts() > 0 || user.getLockedUntil() != null) {
+            user.setFailedLoginAttempts(0);
+            user.setLockedUntil(null);
+            userRepository.save(user);
+        }
 
         String token = jwtService.generateToken(user);
-
         return new LoginResponse(token, user.getId(), user.getEmail(), user.getFullName(), user.isEmailVerified());
+    }
+
+    private void registerFailedAttempt(User user) {
+        int attempts = user.getFailedLoginAttempts() + 1;
+        user.setFailedLoginAttempts(attempts);
+        if (attempts >= MAX_FAILED_ATTEMPTS) {
+            user.setLockedUntil(Instant.now().plus(LOCKOUT_DURATION));
+        }
+        userRepository.save(user);
     }
 
     public AuthResponse register(RegisterRequest request) {

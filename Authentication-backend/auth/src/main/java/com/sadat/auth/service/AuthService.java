@@ -53,15 +53,14 @@ public class AuthService {
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(Instant.now())) {
-            throw new InvalidCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException("Account temporarily locked. Try again later.");
         }
 
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         } catch (AuthenticationException ex) {
-            registerFailedAttempt(user);
-            throw new InvalidCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException(registerFailedAttempt(user));
         }
 
         if (user.getFailedLoginAttempts() > 0 || user.getLockedUntil() != null) {
@@ -74,13 +73,22 @@ public class AuthService {
         return new LoginResponse(token, user.getId(), user.getEmail(), user.getFullName(), user.isEmailVerified());
     }
 
-    private void registerFailedAttempt(User user) {
+    private String registerFailedAttempt(User user) {
         int attempts = user.getFailedLoginAttempts() + 1;
         user.setFailedLoginAttempts(attempts);
+
+        String message;
         if (attempts >= MAX_FAILED_ATTEMPTS) {
             user.setLockedUntil(Instant.now().plus(LOCKOUT_DURATION));
+            message = "Account temporarily locked. Try again later.";
+        } else {
+            int remaining = MAX_FAILED_ATTEMPTS - attempts;
+            message = "Invalid email or password. " + remaining + " attempt" + (remaining == 1 ? "" : "s")
+                    + " remaining.";
         }
+
         userRepository.save(user);
+        return message;
     }
 
     public AuthResponse register(RegisterRequest request) {

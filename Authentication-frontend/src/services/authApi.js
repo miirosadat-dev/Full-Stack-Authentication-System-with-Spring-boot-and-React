@@ -52,6 +52,28 @@ export async function loginUser({ email, password }) {
     const data = await handleResponse(res);
     return {
         token: data.token,
+        refreshToken: data.refreshToken,
         user: { id: data.userId, email: data.email, fullName: data.fullName, emailVerified: data.emailVerified },
     };
+}
+
+export async function refreshAccessToken(refreshToken) {
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+    });
+    const data = await handleResponse(res);
+    return {
+        token: data.token,
+        refreshToken: data.refreshToken,
+        user: { id: data.userId, email: data.email, fullName: data.fullName, emailVerified: data.emailVerified },
+    };
+}
+
+export async function logoutUser(token) {
+    await fetch(`${API_BASE}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
 }

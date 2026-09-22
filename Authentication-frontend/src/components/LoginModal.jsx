@@ -20,7 +20,7 @@ function LoginModal({ onClose, onSwitchToRegister }) {
         setLoading(true);
         try {
             const data = await loginUser(form);
-            login(data.token, data.user);
+            login(data.token, data.refreshToken, data.user);
             onClose();
             navigate('/dashboard');
         } catch (err) {

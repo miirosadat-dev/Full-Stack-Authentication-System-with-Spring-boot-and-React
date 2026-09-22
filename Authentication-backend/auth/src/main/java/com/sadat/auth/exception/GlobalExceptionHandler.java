@@ -124,6 +124,12 @@ public class GlobalExceptionHandler {
                                 request);
         }
 
+        @ExceptionHandler(InvalidResetTokenException.class)
+        public ResponseEntity<ApiError> handleInvalidResetToken(InvalidResetTokenException ex,
+                        HttpServletRequest request) {
+                return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        }
+
         private ResponseEntity<ApiError> buildError(
                         HttpStatus status,
                         String message,

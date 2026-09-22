@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { verifyEmail, resendVerification } from '../services/authApi';
 
 function VerifyEmailModal({ email, onClose, onVerified, onNotify }) {
-    const { refresthUser } = useAuth();
+    const { refreshUser } = useAuth();
     const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [resending, setResending] = useState(false);
@@ -15,7 +15,7 @@ function VerifyEmailModal({ email, onClose, onVerified, onNotify }) {
         setLoading(true);
         try {
             await verifyEmail({ email, code });
-            refresthUser();
+            refreshUser();
             onVerified();
         } catch (err) {
             setError(err.message);

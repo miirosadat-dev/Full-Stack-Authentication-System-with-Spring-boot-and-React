@@ -1,6 +1,7 @@
 package com.sadat.auth.config;
 
 import com.sadat.auth.security.JwtAuthFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +19,9 @@ public class SecurityConfig {
 
         private final JwtAuthFilter jwtAuthFilter;
 
+        @Value("${app.cors.allowed-origins}")
+        private List<String> allowedOrigins;
+
         public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
                 this.jwtAuthFilter = jwtAuthFilter;
         }
@@ -27,6 +31,13 @@ public class SecurityConfig {
                 http
                                 .csrf(csrf -> csrf.disable())
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .headers(headers -> headers
+                                                .frameOptions(frame -> frame.deny())
+                                                .contentTypeOptions(contentType -> {
+                                                })
+                                                .httpStrictTransportSecurity(hsts -> hsts
+                                                                .includeSubDomains(true)
+                                                                .maxAgeInSeconds(31536000)))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
@@ -50,7 +61,7 @@ public class SecurityConfig {
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration config = new CorsConfiguration();
 
-                config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
+                config.setAllowedOrigins(allowedOrigins);
                 config.setAllowedMethods(List.of(
                                 "GET",
                                 "POST",

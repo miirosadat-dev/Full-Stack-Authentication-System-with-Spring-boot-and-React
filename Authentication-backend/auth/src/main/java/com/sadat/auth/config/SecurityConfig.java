@@ -46,6 +46,7 @@ public class SecurityConfig {
                                                                 "/api/auth/login",
                                                                 "/api/auth/verify-email",
                                                                 "/api/auth/resend-verification",
+                                                                "/api/auth/refresh",
                                                                 "/actuator/health")
                                                 .permitAll()
                                                 .anyRequest()

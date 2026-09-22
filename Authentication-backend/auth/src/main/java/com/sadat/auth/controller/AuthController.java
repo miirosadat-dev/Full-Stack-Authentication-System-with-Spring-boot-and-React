@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sadat.auth.dto.AuthResponse;
 import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
+import com.sadat.auth.dto.RefreshTokenRequest;
 import com.sadat.auth.dto.RegisterRequest;
 import com.sadat.auth.dto.ResendVerificationRequest;
 import com.sadat.auth.dto.UserResponse;
@@ -57,5 +58,16 @@ public class AuthController {
     public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
         UserResponse response = authService.getCurrentUser(authentication.getName());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(Authentication authentication) {
+        authService.logout(authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 }

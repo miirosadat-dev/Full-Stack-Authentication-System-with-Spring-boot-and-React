@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.sadat.auth.dto.AuthResponse;
 import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
+import com.sadat.auth.dto.RefreshTokenRequest;
 import com.sadat.auth.dto.RegisterRequest;
 import com.sadat.auth.dto.UserResponse;
 import com.sadat.auth.dto.VerifyEmailRequest;
@@ -34,18 +35,21 @@ public class AuthService {
     private final JwtService jwtService;
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final Duration LOCKOUT_DURATION = Duration.ofMinutes(15);
+    private final RefreshTokenService refreshTokenService;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             OtpService otpService,
             AuthenticationManager authenticationManager,
-            JwtService jwtService) {
+            JwtService jwtService,
+            RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -70,7 +74,23 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(user);
-        return new LoginResponse(token, user.getId(), user.getEmail(), user.getFullName(), user.isEmailVerified());
+        String refreshToken = refreshTokenService.createToken(user);
+        return new LoginResponse(token, refreshToken, user.getId(), user.getEmail(), user.getFullName(),
+                user.isEmailVerified());
+    }
+
+    public LoginResponse refresh(RefreshTokenRequest request) {
+        RefreshTokenService.RotatedTokens rotated = refreshTokenService.validateAndRotate(request.refreshToken());
+        User user = rotated.user();
+        String newAccessToken = jwtService.generateToken(user);
+        return new LoginResponse(newAccessToken, rotated.rawToken(), user.getId(), user.getEmail(), user.getFullName(),
+                user.isEmailVerified());
+    }
+
+    public void logout(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid request"));
+        refreshTokenService.revokeAllForUser(user);
     }
 
     private String registerFailedAttempt(User user) {

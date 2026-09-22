@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.sadat.auth.entity.RefreshToken;
 import com.sadat.auth.entity.User;
+import com.sadat.auth.exception.InvalidRefreshTokenException;
 import com.sadat.auth.repository.RefreshTokenRepository;
 
 import jakarta.transaction.Transactional;

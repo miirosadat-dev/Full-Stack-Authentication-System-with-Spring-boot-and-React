@@ -113,6 +113,17 @@ public class GlobalExceptionHandler {
                 return buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
         }
 
+        @ExceptionHandler(InvalidRefreshTokenException.class)
+        public ResponseEntity<ApiError> handleInvalidRefreshToken(
+                        InvalidRefreshTokenException ex,
+                        HttpServletRequest request) {
+
+                return buildError(
+                                HttpStatus.UNAUTHORIZED,
+                                ex.getMessage(),
+                                request);
+        }
+
         private ResponseEntity<ApiError> buildError(
                         HttpStatus status,
                         String message,

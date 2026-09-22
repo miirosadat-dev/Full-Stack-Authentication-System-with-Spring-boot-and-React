@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sadat.auth.dto.AuthResponse;
+import com.sadat.auth.dto.ForgotPasswordRequest;
 import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
 import com.sadat.auth.dto.RefreshTokenRequest;
 import com.sadat.auth.dto.RegisterRequest;
 import com.sadat.auth.dto.ResendVerificationRequest;
+import com.sadat.auth.dto.ResetPasswordRequest;
 import com.sadat.auth.dto.UserResponse;
 import com.sadat.auth.dto.VerifyEmailRequest;
 import com.sadat.auth.service.AuthService;
@@ -69,5 +71,17 @@ public class AuthController {
     public ResponseEntity<Void> logout(Authentication authentication) {
         authService.logout(authentication.getName());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request.email());
+        return ResponseEntity.ok("If an account with that email exists, a reset link has been sent.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok("Password reset successfully. Please log in.");
     }
 }

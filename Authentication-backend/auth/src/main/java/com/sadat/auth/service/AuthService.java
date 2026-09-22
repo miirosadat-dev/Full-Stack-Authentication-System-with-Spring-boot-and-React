@@ -1,8 +1,16 @@
 package com.sadat.auth.service;
 
+import com.sadat.auth.repository.PasswordResetTokenRepository;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -14,28 +22,35 @@ import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
 import com.sadat.auth.dto.RefreshTokenRequest;
 import com.sadat.auth.dto.RegisterRequest;
+import com.sadat.auth.dto.ResetPasswordRequest;
 import com.sadat.auth.dto.UserResponse;
 import com.sadat.auth.dto.VerifyEmailRequest;
 import com.sadat.auth.entity.OtpVerification;
+import com.sadat.auth.entity.PasswordResetToken;
 import com.sadat.auth.entity.User;
 import com.sadat.auth.exception.DuplicateEmailException;
 import com.sadat.auth.exception.EmailAlreadyVerifiedException;
 import com.sadat.auth.exception.InvalidCredentialsException;
 import com.sadat.auth.exception.InvalidOtpException;
+import com.sadat.auth.exception.InvalidResetTokenException;
 import com.sadat.auth.repository.UserRepository;
 import com.sadat.auth.security.JwtService;
 
 @Service
 public class AuthService {
 
+    private final EmailService emailService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final OtpService otpService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final String frontendBaseUrl;
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final Duration LOCKOUT_DURATION = Duration.ofMinutes(15);
     private final RefreshTokenService refreshTokenService;
+    private static final Duration RESET_TOKEN_VALIDITY = Duration.ofMinutes(30);
 
     public AuthService(
             UserRepository userRepository,
@@ -43,13 +58,18 @@ public class AuthService {
             OtpService otpService,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
-            RefreshTokenService refreshTokenService) {
+            @Value("${app.frontend-url}") String frontendBaseUrl,
+            RefreshTokenService refreshTokenService, PasswordResetTokenRepository passwordResetTokenRepository,
+            EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.frontendBaseUrl = frontendBaseUrl;
         this.refreshTokenService = refreshTokenService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.emailService = emailService;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -161,5 +181,53 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new InvalidCredentialsException("User not found"));
         return new UserResponse(user.getId(), user.getEmail(), user.getFullName(), user.isEmailVerified());
+    }
+
+    public void forgotPassword(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String rawToken = UUID.randomUUID().toString() + UUID.randomUUID();
+            PasswordResetToken resetToken = PasswordResetToken.builder()
+                    .user(user)
+                    .tokenHash(hashToken(rawToken))
+                    .expiresAt(Instant.now().plus(RESET_TOKEN_VALIDITY))
+                    .used(false)
+                    .build();
+            passwordResetTokenRepository.save(resetToken);
+
+            String resetLink = frontendBaseUrl + "/reset-password?token=" + rawToken;
+            emailService.sendEmail(
+                    user.getEmail(),
+                    "Reset your Anchor password",
+                    "Click here to reset your password: " + resetLink + "\nThis link expires in 30 minutes.");
+        });
+        // No else branch — same response whether the email exists or not
+        // (enumeration-safe, same pattern as Phase 8's resend-verification)
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(hashToken(request.token()))
+                .filter(t -> !t.isUsed())
+                .filter(t -> t.getExpiresAt().isAfter(Instant.now()))
+                .orElseThrow(() -> new InvalidResetTokenException(
+                        "Invalid or expired reset link. Please request a new one."));
+
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+
+        refreshTokenService.revokeAllForUser(user); // password changed — kill all existing sessions
+    }
+
+    private String hashToken(String raw) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hashBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

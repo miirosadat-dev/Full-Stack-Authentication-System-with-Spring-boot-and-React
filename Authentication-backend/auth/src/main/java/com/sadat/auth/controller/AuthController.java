@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sadat.auth.dto.AuthResponse;
+import com.sadat.auth.dto.ChangePasswordRequest;
 import com.sadat.auth.dto.ForgotPasswordRequest;
 import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
@@ -83,5 +84,12 @@ public class AuthController {
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
         return ResponseEntity.ok("Password reset successfully. Please log in.");
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequest request,
+            Authentication authentication) {
+        authService.changePassword(authentication.getName(), request);
+        return ResponseEntity.ok("Password changed successfully.");
     }
 }

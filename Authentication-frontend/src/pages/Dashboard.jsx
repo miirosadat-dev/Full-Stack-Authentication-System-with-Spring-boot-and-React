@@ -1,11 +1,11 @@
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../layouts/AppLayout';
 
-function Dashboard({ onOpenVerify }) {
+function Dashboard({ onOpenVerify, onOpenAccountSettings }) {
     const { user } = useAuth();
 
     return (
-        <AppLayout onOpenVerify={onOpenVerify}>
+        <AppLayout onOpenVerify={onOpenVerify} onOpenAccountSettings={onOpenAccountSettings}>
             <div className="max-w-2xl mx-auto p-8">
                 <h1 className="text-2xl font-bold mb-4">Hello, {user.fullName}</h1>
                 <p className="text-slate-muted">Email: {user.email}</p>

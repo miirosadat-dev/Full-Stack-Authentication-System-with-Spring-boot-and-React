@@ -1,6 +1,6 @@
 import ProfileMenu from './ProfileMenu';
 
-function AppHeader({ onOpenVerify }) {
+function AppHeader({ onOpenVerify, onOpenAccountSettings }) {
     return (
         <header className="border-b border-gray-300">
             <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
@@ -13,7 +13,7 @@ function AppHeader({ onOpenVerify }) {
                     <span className="font-display text-xl font-bold text-orange-500">Anchor</span>
                 </div>
 
-                <ProfileMenu onOpenVerify={onOpenVerify} />
+                <ProfileMenu onOpenVerify={onOpenVerify} onOpenAccountSettings={onOpenAccountSettings} />
             </div>
         </header>
     );

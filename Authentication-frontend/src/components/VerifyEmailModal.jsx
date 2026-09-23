@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { verifyEmail, resendVerification } from '../services/authApi';
 
 function VerifyEmailModal({ email, onClose, onVerified, onNotify }) {
-    const { refreshUser } = useAuth();
+    const { login, refreshUser, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
     const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [resending, setResending] = useState(false);
@@ -14,8 +16,17 @@ function VerifyEmailModal({ email, onClose, onVerified, onNotify }) {
         setError('');
         setLoading(true);
         try {
-            await verifyEmail({ email, code });
-            refreshUser();
+            const data = await verifyEmail({ email, code });
+
+            if (isAuthenticated) {
+                // already logged in — this was triggered from the dropdown/dashboard, not fresh registration
+                refreshUser();
+            } else {
+                // fresh registration flow — log the user straight in
+                login(data.token, data.refreshToken, data.user);
+                navigate('/dashboard');
+            }
+
             onVerified();
         } catch (err) {
             setError(err.message);

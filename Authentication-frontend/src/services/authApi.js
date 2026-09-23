@@ -23,7 +23,12 @@ export async function verifyEmail({ email, code }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
     });
-    return handleResponse(res);
+    const data = await handleResponse(res);
+    return {
+        token: data.token,
+        refreshToken: data.refreshToken,
+        user: { id: data.userId, email: data.email, fullName: data.fullName, emailVerified: data.emailVerified },
+    };
 }
 
 export async function resendVerification(email) {

@@ -48,8 +48,8 @@ public class AuthController {
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<AuthResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
-        AuthResponse response = authService.verifyEmail(request);
+    public ResponseEntity<LoginResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        LoginResponse response = authService.verifyEmail(request);
         return ResponseEntity.ok(response);
     }
 

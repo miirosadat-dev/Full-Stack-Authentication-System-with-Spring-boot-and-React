@@ -164,7 +164,7 @@ public class AuthService {
         // the caller gets an identical response either way. See controller.
     }
 
-    public AuthResponse verifyEmail(VerifyEmailRequest request) {
+    public LoginResponse verifyEmail(VerifyEmailRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new InvalidOtpException("Invalid code or account"));
 
@@ -177,7 +177,9 @@ public class AuthService {
         user.setEmailVerified(true);
         userRepository.save(user);
 
-        return new AuthResponse(user.getId(), user.getEmail(), true, "Email verified successfully.");
+        String token = jwtService.generateToken(user);
+        String refreshToken = refreshTokenService.createToken(user);
+        return new LoginResponse(token, refreshToken, user.getId(), user.getEmail(), user.getFullName(), true);
     }
 
     public UserResponse getCurrentUser(String email) {

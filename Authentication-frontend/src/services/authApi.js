@@ -77,3 +77,48 @@ export async function logoutUser(token) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     });
 }
+
+export async function forgotPassword(email) {
+    const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+    });
+    return handleResponse(res);
+}
+
+export async function resetPassword({ token, newPassword }) {
+    const res = await fetch(`${API_BASE}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, newPassword }),
+    });
+    return handleResponse(res);
+}
+
+export async function changePassword({ currentPassword, newPassword }, token) {
+    const res = await fetch(`${API_BASE}/auth/change-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    return handleResponse(res);
+}
+
+export async function requestEmailChange({ newEmail, currentPassword }, token) {
+    const res = await fetch(`${API_BASE}/auth/change-email/request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ newEmail, currentPassword }),
+    });
+    return handleResponse(res);
+}
+
+export async function confirmEmailChange(code, token) {
+    const res = await fetch(`${API_BASE}/auth/change-email/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ code }),
+    });
+    return handleResponse(res);
+}

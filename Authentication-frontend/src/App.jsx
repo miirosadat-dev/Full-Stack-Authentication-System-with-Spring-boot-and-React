@@ -4,13 +4,16 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import RegisterModal from './components/RegisterModal';
 import LoginModal from './components/LoginModal';
 import VerifyEmailModal from './components/VerifyEmailModal';
+import ForgotPasswordModal from './components/ForgotPasswordModal';
+import AccountSettingsModal from './components/AccountSettingsModal';
 import { ToastContainer } from './components/Toast';
 
 function App() {
-    const [activeModal, setActiveModal] = useState(null); // null | 'register' | 'login' | 'verify'
+    const [activeModal, setActiveModal] = useState(null); // null | 'register' | 'login' | 'verify' | 'forgot' | 'accountSettings'
     const [pendingEmail, setPendingEmail] = useState('');
     const [toasts, setToasts] = useState([]);
 
@@ -50,6 +53,7 @@ function App() {
                                 onOpenRegister={() => setActiveModal('register')}
                                 onOpenLogin={() => setActiveModal('login')}
                                 onOpenVerify={handleOpenVerify}
+                                onOpenAccountSettings={() => setActiveModal('accountSettings')}
                             />
                         }
                     />
@@ -57,10 +61,14 @@ function App() {
                         path="/dashboard"
                         element={
                             <ProtectedRoute>
-                                <Dashboard onOpenVerify={handleOpenVerify} />
+                                <Dashboard
+                                    onOpenVerify={handleOpenVerify}
+                                    onOpenAccountSettings={() => setActiveModal('accountSettings')}
+                                />
                             </ProtectedRoute>
                         }
                     />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
                 </Routes>
 
                 {activeModal === 'register' && (
@@ -75,6 +83,7 @@ function App() {
                     <LoginModal
                         onClose={() => setActiveModal(null)}
                         onSwitchToRegister={() => setActiveModal('register')}
+                        onForgotPassword={() => setActiveModal('forgot')}
                     />
                 )}
 
@@ -85,6 +94,14 @@ function App() {
                         onVerified={handleVerified}
                         onNotify={notify}
                     />
+                )}
+
+                {activeModal === 'forgot' && (
+                    <ForgotPasswordModal onClose={() => setActiveModal(null)} />
+                )}
+
+                {activeModal === 'accountSettings' && (
+                    <AccountSettingsModal onClose={() => setActiveModal(null)} />
                 )}
 
                 <ToastContainer toasts={toasts} onDismiss={dismissToast} />

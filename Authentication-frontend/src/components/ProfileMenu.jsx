@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Avatar from './Avatar';
 
-function ProfileMenu({ onOpenVerify }) {
+function ProfileMenu({ onOpenVerify, onOpenAccountSettings }) {
     const [open, setOpen] = useState(false);
     const menuRef = useRef(null);
     const { user, logout } = useAuth();
@@ -43,6 +43,13 @@ function ProfileMenu({ onOpenVerify }) {
                             Verify email
                         </button>
                     )}
+
+                    <button
+                        onClick={() => { setOpen(false); onOpenAccountSettings(); }}
+                        className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                        Account settings
+                    </button>
 
                     <button
                         onClick={logout}

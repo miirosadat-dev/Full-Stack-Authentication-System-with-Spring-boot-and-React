@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/authApi';
 import { useAuth } from '../context/AuthContext';
 
-function LoginModal({ onClose, onSwitchToRegister }) {
+function LoginModal({ onClose, onSwitchToRegister, onForgotPassword }) {
     const [form, setForm] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -54,6 +54,12 @@ function LoginModal({ onClose, onSwitchToRegister }) {
                         />
                     </div>
 
+                    <div className="text-right">
+                        <button type="button" onClick={onForgotPassword} className="text-xs text-slate-500 hover:underline">
+                            Forgot password?
+                        </button>
+                    </div>
+
                     {error && <p className="text-sm text-red-600">{error}</p>}
 
                     <button
@@ -70,7 +76,13 @@ function LoginModal({ onClose, onSwitchToRegister }) {
                         Register
                     </button>
                 </p>
+
+
+
             </div>
+
+
+
         </div>
     );
 }

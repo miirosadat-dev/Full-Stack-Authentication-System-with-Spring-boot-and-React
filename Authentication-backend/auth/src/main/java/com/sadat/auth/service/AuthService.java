@@ -18,7 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sadat.auth.dto.AuthResponse;
+import com.sadat.auth.dto.ChangeEmailRequest;
 import com.sadat.auth.dto.ChangePasswordRequest;
+import com.sadat.auth.dto.ConfirmEmailChangeRequest;
 import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
 import com.sadat.auth.dto.RefreshTokenRequest;
@@ -243,5 +245,42 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
         refreshTokenService.revokeAllForUser(user); // same reasoning as reset-password — force re-login everywhere
+    }
+
+    public void requestEmailChange(String currentEmail, ChangeEmailRequest request) {
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid request"));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Current password is incorrect");
+        }
+
+        if (userRepository.findByEmail(request.newEmail()).isPresent()) {
+            throw new DuplicateEmailException("An account with that email already exists");
+        }
+
+        user.setPendingEmail(request.newEmail());
+        userRepository.save(user);
+
+        otpService.createAndSendOtp(user, OtpVerification.Purpose.EMAIL_CHANGE, request.newEmail());
+    }
+
+    public void confirmEmailChange(String currentEmail, ConfirmEmailChangeRequest request) {
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid request"));
+
+        if (user.getPendingEmail() == null) {
+            throw new InvalidOtpException("No pending email change found.");
+        }
+
+        otpService.verifyOtp(user, OtpVerification.Purpose.EMAIL_CHANGE, request.code());
+
+        user.setEmail(user.getPendingEmail());
+        user.setPendingEmail(null);
+        user.setEmailVerified(true); // the OTP just proved ownership of the new address
+        userRepository.save(user);
+
+        refreshTokenService.revokeAllForUser(user); // email is part of identity — force re-login, same pattern as
+                                                    // password changes
     }
 }

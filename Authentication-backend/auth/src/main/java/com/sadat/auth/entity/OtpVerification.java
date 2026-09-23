@@ -23,7 +23,8 @@ import java.util.UUID;
 public class OtpVerification {
 
     public enum Purpose {
-        EMAIL_VERIFICATION
+        EMAIL_VERIFICATION,
+        EMAIL_CHANGE
         // room to add PASSWORD_RESET later without a schema change
     }
 

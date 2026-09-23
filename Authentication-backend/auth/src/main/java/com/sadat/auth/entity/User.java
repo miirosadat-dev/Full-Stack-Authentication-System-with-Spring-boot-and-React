@@ -51,4 +51,6 @@ public class User {
     private int failedLoginAttempts = 0;
 
     private Instant lockedUntil;
+
+    private String pendingEmail; // nullable — set only during an in-progress email change
 }

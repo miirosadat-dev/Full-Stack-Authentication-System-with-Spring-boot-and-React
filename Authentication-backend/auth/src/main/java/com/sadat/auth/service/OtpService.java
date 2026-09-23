@@ -37,6 +37,10 @@ public class OtpService {
     }
 
     public void createAndSendOtp(User user, OtpVerification.Purpose purpose) {
+        createAndSendOtp(user, purpose, user.getEmail());
+    }
+
+    public void createAndSendOtp(User user, OtpVerification.Purpose purpose, String deliveryAddress) {
         Optional<OtpVerification> latest = otpRepository.findTopByUserAndPurposeOrderByCreatedAtDesc(user, purpose);
 
         if (latest.isPresent()) {
@@ -62,7 +66,7 @@ public class OtpService {
         otpRepository.save(otp);
 
         emailService.sendEmail(
-                user.getEmail(),
+                deliveryAddress,
                 "Verify your Anchor account",
                 "Your verification code is: " + rawCode + "\nThis code expires in 10 minutes.");
     }

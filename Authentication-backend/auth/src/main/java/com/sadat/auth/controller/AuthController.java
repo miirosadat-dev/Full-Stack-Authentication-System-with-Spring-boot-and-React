@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sadat.auth.dto.AuthResponse;
+import com.sadat.auth.dto.ChangeEmailRequest;
 import com.sadat.auth.dto.ChangePasswordRequest;
+import com.sadat.auth.dto.ConfirmEmailChangeRequest;
 import com.sadat.auth.dto.ForgotPasswordRequest;
 import com.sadat.auth.dto.LoginRequest;
 import com.sadat.auth.dto.LoginResponse;
@@ -91,5 +93,19 @@ public class AuthController {
             Authentication authentication) {
         authService.changePassword(authentication.getName(), request);
         return ResponseEntity.ok("Password changed successfully.");
+    }
+
+    @PostMapping("/change-email/request")
+    public ResponseEntity<String> requestEmailChange(@Valid @RequestBody ChangeEmailRequest request,
+            Authentication authentication) {
+        authService.requestEmailChange(authentication.getName(), request);
+        return ResponseEntity.ok("Verification code sent to your new email address.");
+    }
+
+    @PostMapping("/change-email/confirm")
+    public ResponseEntity<String> confirmEmailChange(@Valid @RequestBody ConfirmEmailChangeRequest request,
+            Authentication authentication) {
+        authService.confirmEmailChange(authentication.getName(), request);
+        return ResponseEntity.ok("Email updated successfully.");
     }
 }

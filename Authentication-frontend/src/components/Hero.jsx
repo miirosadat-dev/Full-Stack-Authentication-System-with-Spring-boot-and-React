@@ -1,4 +1,4 @@
-function Hero({ onOpenRegister }) {
+function Hero({ onOpenRegister, onOpenLogin }) {
     return (
         <section className="max-w-6xl mx-auto px-6 pt-20 pb-28 grid md:grid-cols-2 gap-10 items-center">
             <div>
@@ -15,7 +15,7 @@ function Hero({ onOpenRegister }) {
                         Get started
                     </button>
 
-                    <button className="px-6 py-3 text-orange-500 cursor-pointer border border-white/15 rounded-md hover:border-white/30 transition-colors">
+                    <button onClick={onOpenLogin} className="px-6 py-3 text-orange-500 cursor-pointer border border-white/15 rounded-md hover:border-white/30 transition-colors">
                         Log in
                     </button>
                 </div>
@@ -28,7 +28,7 @@ function Hero({ onOpenRegister }) {
                     <span className="w-2.5 h-2.5 rounded-full bg-white/15"></span>
                 </div>
                 <p className="text-brass">// decoded session token</p>
-                <pre className="mt-3 lg:ml-30 md:ml-15 ml-5 text-paper/90">
+                <pre className="mt-3 lg:ml-30 md:ml-15 ml-5 text-white">
                     {`{
   "sub": "user_8f2a1c",
   "email_verified": true,

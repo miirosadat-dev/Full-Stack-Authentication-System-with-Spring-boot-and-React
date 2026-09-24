@@ -5,7 +5,7 @@ function Header({ onOpenRegister, onOpenLogin, onOpenVerify }) {
     const { isAuthenticated } = useAuth();
 
     return (
-        <header className="border-b border-gray-300">
+        <header className="border-b border-gray-200 bg-gray-100 shadow-md">
             <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">

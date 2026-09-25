@@ -39,6 +39,8 @@ import com.sadat.auth.exception.InvalidResetTokenException;
 import com.sadat.auth.repository.UserRepository;
 import com.sadat.auth.security.JwtService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AuthService {
 
@@ -209,6 +211,7 @@ public class AuthService {
         // (enumeration-safe, same pattern as Phase 8's resend-verification)
     }
 
+    @Transactional
     public void resetPassword(ResetPasswordRequest request) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(hashToken(request.token()))
                 .filter(t -> !t.isUsed())

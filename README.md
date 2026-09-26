@@ -6,7 +6,7 @@ A production-grade authentication system built from scratch with **Spring Boot**
 
 > Free-tier hosting note: the backend (Render) spins down after periods of inactivity, so the first request after a while may take 30–60 seconds to wake up. Every request after that is fast.
 
-![Anchor homepage](docs/screenshot-home.png)
+![Anchor homepage](screenshot-home.png)
 
 ---
 
